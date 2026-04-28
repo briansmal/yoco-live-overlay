@@ -1,205 +1,261 @@
-<html> 
+<html lang="af"> 
 <head>
 <meta charset="UTF-8">
-<title>Finansiële Impak</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Finansiële Impak - Groter En Duideliker</title>
 
 <style>
-body {
-  margin: 0;
-  background: transparent;
-  font-family: 'Segoe UI', sans-serif;
-}
+  /* RESET & BASIC STYLES */
+  body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #0c0c0c; /* Deep, dark background for maximum contrast */
+    font-family: 'Inter', 'Segoe UI', Helvetica, sans-serif; /* Cleaner, bolder system font stack */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-/* MAIN PANEL */
-.overlay {
-  position: absolute;
-  bottom: 50px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 85%;
-  padding: 25px 35px;
+  /* OPTIMIZED VISUAL OVERLAY */
+  .overlay {
+    width: 90%; /* Utilize more screen space */
+    max-width: 1400px;
+    padding: 40px 60px; /* Increased spacing */
+    background: linear-gradient(135deg, rgba(30,30,30,0.95) 0%, rgba(15,15,15,0.95) 100%);
+    backdrop-filter: blur(15px);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5); /* Deep shadow for better separation */
+    transition: all 0.3s ease;
+  }
 
-  background: rgba(20, 20, 20, 0.85);
-  backdrop-filter: blur(10px);
+  /* REFINED GRID STRUCTURE */
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    align-items: center;
+    gap: 30px;
+    margin-bottom: 25px;
+  }
 
-  border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.12);
-}
+  /* LEFT-SIDE TEXT - MUCH BOLDER */
+  .left {
+    text-align: left;
+  }
 
-/* TOP BRANDING ROW */
-.branding-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
+  .title {
+    font-size: 1.6rem; /* Significantly larger */
+    font-weight: 800; /* Extra bold */
+    letter-spacing: 2px;
+    color: #e0e0e0; /* Off-white for readability */
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  }
 
-.main-graphic {
-  height: 60px; /* Adjust based on preference */
-}
+  .subtitle {
+    font-size: 1.0rem; /* Larger */
+    font-weight: 400;
+    color: #b0b0b0; /* Light gray */
+    letter-spacing: 1px;
+    margin-top: 5px;
+  }
 
-.sponsor-logos {
-  height: 40px; /* Adjust based on preference */
-  opacity: 0.9;
-}
+  /* CENTER AMOUNT - DOMINANT DISPLAY */
+  .center {
+    text-align: center;
+  }
 
-/* GRID */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr 2fr 1fr;
-  align-items: center;
-}
+  .amount {
+    font-size: 5rem; /* Massive, impossible to miss */
+    font-weight: 900; /* Max bold */
+    color: #ffffff;
+    letter-spacing: -2px;
+    text-shadow: 0 4px 8px rgba(0,0,0,0.5);
+    background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
 
-/* LEFT */
-.left {
-  text-align: left;
-}
+  /* RIGHT-SIDE QR CODE - HIGHER CONTRAST */
+  .right {
+    text-align: right;
+  }
 
-.title {
-  font-size: 0.95em;
-  font-weight: bold;
-  letter-spacing: 2px;
-  color: #2ed1a2; /* Themed to match the bar */
-}
+  .qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+  }
 
-.subtitle {
-  font-size: 0.8em;
-  color: #999;
-}
+  .qr img {
+    width: 100px; /* Larger QR */
+    height: 100px;
+    padding: 8px; /* Background padding */
+    background-color: white; /* Mandatory for reliable scanning on dark bg */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  }
 
-/* CENTER */
-.center {
-  text-align: center;
-}
+  .qr span {
+    display: block;
+    font-size: 0.9rem; /* Larger */
+    font-weight: 600; /* Bolder */
+    color: #f0f0f0;
+    letter-spacing: 0.5px;
+  }
 
-.amount {
-  font-size: 3em;
-  font-weight: 700;
-  color: white;
-  text-shadow: 0 0 15px rgba(46, 209, 162, 0.3);
-}
+  /* PROGRESS BAR - BOLDER & COLORFUL */
+  .bar-container {
+    width: 100%;
+    height: 20px; /* Thicker bar */
+    background-color: rgba(255,255,255,0.08); /* Darker track */
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
 
-/* RIGHT */
-.right {
-  text-align: right;
-}
+  .bar {
+    height: 100%;
+    width: 0%; /* Dynamic width */
+    background: linear-gradient(90deg, #2ed1a2 0%, #3fe1b3 100%); /* Bright, modern gradient */
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(46, 209, 162, 0.6); /* Glow effect */
+    transition: width 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67); /* Smoother animation */
+  }
 
-.qr img {
-  width: 85px;
-  border-radius: 4px;
-  background: white; /* Contrast for scanning */
-  padding: 3px;
-}
+  /* BOLDER FOOTER */
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    font-size: 0.9rem; /* Larger */
+    font-weight: 600; /* Bolder */
+    color: #a0a0a0;
+  }
 
-.qr span {
-  display: block;
-  font-size: 0.7em;
-  color: #ccc;
-  margin-top: 5px;
-}
+  .footer-live {
+    color: #e74c3c; /* Red for 'Live' */
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
 
-/* BAR */
-.bar-container {
-  margin-top: 20px;
-  width: 100%;
-  height: 14px;
-  background: rgba(255,255,255,0.1);
-  border-radius: 7px;
-  overflow: hidden;
-}
+  .footer-live::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background-color: #e74c3c;
+    border-radius: 50%;
+    animation: blink 1s infinite alternate;
+  }
 
-.bar {
-  height: 100%;
-  width: 0%;
-  background: linear-gradient(90deg, #2ed1a2, #23a07c);
-  transition: width 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
-}
+  /* ANIMATIONS */
+  .pulse {
+    animation: pulse 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
 
-/* FOOTER */
-.footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 10px;
-  font-size: 0.8em;
-  color: #aaa;
-}
+  @keyframes blink {
+    from { opacity: 1; }
+    to { opacity: 0.3; }
+  }
 
-.pulse {
-  animation: pulse 0.4s ease;
-}
+  @keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+    50% { transform: scale(1.02); box-shadow: 0 15px 50px rgba(46, 209, 162, 0.4); }
+    100% { transform: scale(1); box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
+  }
 
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.015); }
-  100% { transform: scale(1); }
-}
+  /* RESPONSIVE BREAKPOINT FOR MOBILE */
+  @media (max-width: 768px) {
+    .overlay { padding: 25px; width: 95%; }
+    .grid { grid-template-columns: 1fr; text-align: center; gap: 20px; }
+    .left, .center, .right { text-align: center; }
+    .amount { font-size: 3rem; }
+    .qr-container { align-items: center; }
+  }
 </style>
 </head>
 
 <body>
 
-<div class="overlay" id="overlay">
+  <div class="overlay" id="overlay">
 
-  <div class="branding-header">
-    <img src="main_page.png" alt="Gholfdag" class="main-graphic">
-    <img src="inpas_aim_logos.png" alt="Sponsors" class="sponsor-logos">
-  </div>
+    <div class="grid">
 
-  <div class="grid">
-
-    <div class="left">
-      <div class="title">FINANSIËLE IMPAK</div>
-      <div class="subtitle">Deursigtigheid • Vertroue • Groei</div>
-    </div>
-
-    <div class="center">
-      <div class="amount" id="amount">R0 ingesamel</div>
-    </div>
-
-    <div class="right">
-      <div class="qr">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=YOUR_YOCO_LINK_HERE">
-        <span>Skandeer om by te dra</span>
+      <div class="left">
+        <div class="title">FINANSIËLE IMPAK</div>
+        <div class="subtitle">Deursigtigheid • Vertroue • Groei</div>
       </div>
+
+      <div class="center">
+        <div class="amount" id="amount">R0</div>
+      </div>
+
+      <div class="right">
+        <div class="qr-container">
+          <div class="qr">
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YOUR_PAYMENT_LINK_HERE" alt="Payment QR Code">
+          </div>
+          <span>Skandeer om by te dra</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bar-container">
+      <div class="bar" id="bar"></div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-live">Regstreekse opdatering</div>
+      <div>Teikenbedrag: <span style="font-weight: 800; color: #fff;">R50 000</span></div>
     </div>
 
   </div>
 
-  <div class="bar-container">
-    <div class="bar" id="bar"></div>
-  </div>
+  <script>
+    const goal = 50000;
+    let current = 0;
 
-  <div class="footer">
-    <div>Regstreekse opdatering</div>
-    <div id="target">Teikenbedrag: R50 000</div>
-  </div>
+    // Simulate update for demonstration. Use the real SSE source below.
+    // setTimeout(() => updateProgress(12500), 1000);
+    // setTimeout(() => updateProgress(31000), 3000);
+    // setTimeout(() => updateProgress(50000), 5000);
 
-</div>
+    const evtSource = new EventSource('/events');
 
-<script>
-const goal = 50000;
-let current = 0;
+    evtSource.onmessage = function(event) {
+      const data = JSON.parse(event.data);
+      updateProgress(data.total);
+    };
 
-const evtSource = new EventSource('/events');
+    function updateProgress(newTotal) {
+      if (newTotal !== current) {
+        current = newTotal;
 
-evtSource.onmessage = function(event) {
-  const data = JSON.parse(event.data);
+        const amountElement = document.getElementById('amount');
+        const barElement = document.getElementById('bar');
+        const overlayElement = document.getElementById('overlay');
 
-  if (data.total !== current) {
-    current = data.total;
+        // Update amount text with locale-aware formatting
+        amountElement.innerText = 'R' + current.toLocaleString('af-ZA');
 
-    document.getElementById('amount').innerText =
-      'R' + current.toLocaleString('en-ZA') + ' ingesamel';
+        // Update bar width
+        const percent = Math.min((current / goal) * 100, 100);
+        barElement.style.width = percent + '%';
 
-    const percent = Math.min((current / goal) * 100, 100);
-    document.getElementById('bar').style.width = percent + '%';
-
-    const overlay = document.getElementById('overlay');
-    overlay.classList.add('pulse');
-    setTimeout(() => overlay.classList.remove('pulse'), 400);
-  }
-};
-</script>
+        // Trigger pulse animation
+        overlayElement.classList.remove('pulse');
+        void overlayElement.offsetWidth; // Trigger reflow
+        overlayElement.classList.add('pulse');
+      }
+    }
+  </script>
 
 </body>
 </html>
