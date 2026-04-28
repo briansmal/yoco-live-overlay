@@ -1,0 +1,12 @@
+// =========================
+// render.yaml
+// =========================
+/*
+services:
+  - type: web
+    name: yoco-live-overlay
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: node server.js
+*/
