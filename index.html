@@ -1,4 +1,4 @@
-<html>
+<html> 
 <head>
 <meta charset="UTF-8">
 <title>Finansiële Impak</title>
@@ -16,14 +16,31 @@ body {
   bottom: 50px;
   left: 50%;
   transform: translateX(-50%);
-  width: 80%;
-  padding: 20px 30px;
+  width: 85%;
+  padding: 25px 35px;
 
   background: rgba(20, 20, 20, 0.85);
   backdrop-filter: blur(10px);
 
   border-radius: 16px;
-  border: 1px solid rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* TOP BRANDING ROW */
+.branding-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.main-graphic {
+  height: 60px; /* Adjust based on preference */
+}
+
+.sponsor-logos {
+  height: 40px; /* Adjust based on preference */
+  opacity: 0.9;
 }
 
 /* GRID */
@@ -39,14 +56,15 @@ body {
 }
 
 .title {
-  font-size: 0.9em;
+  font-size: 0.95em;
+  font-weight: bold;
   letter-spacing: 2px;
-  color: #aaa;
+  color: #2ed1a2; /* Themed to match the bar */
 }
 
 .subtitle {
   font-size: 0.8em;
-  color: #666;
+  color: #999;
 }
 
 /* CENTER */
@@ -55,9 +73,10 @@ body {
 }
 
 .amount {
-  font-size: 2.8em;
-  font-weight: 600;
+  font-size: 3em;
+  font-weight: 700;
   color: white;
+  text-shadow: 0 0 15px rgba(46, 209, 162, 0.3);
 }
 
 /* RIGHT */
@@ -66,38 +85,43 @@ body {
 }
 
 .qr img {
-  width: 80px;
+  width: 85px;
+  border-radius: 4px;
+  background: white; /* Contrast for scanning */
+  padding: 3px;
 }
 
 .qr span {
   display: block;
   font-size: 0.7em;
   color: #ccc;
+  margin-top: 5px;
 }
 
 /* BAR */
 .bar-container {
-  margin-top: 15px;
+  margin-top: 20px;
   width: 100%;
-  height: 12px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 6px;
+  height: 14px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 7px;
+  overflow: hidden;
 }
 
 .bar {
   height: 100%;
   width: 0%;
-  background: #2ed1a2;
-  transition: width 0.8s ease;
+  background: linear-gradient(90deg, #2ed1a2, #23a07c);
+  transition: width 1.2s cubic-bezier(0.17, 0.67, 0.83, 0.67);
 }
 
 /* FOOTER */
 .footer {
   display: flex;
   justify-content: space-between;
-  margin-top: 8px;
-  font-size: 0.75em;
-  color: #888;
+  margin-top: 10px;
+  font-size: 0.8em;
+  color: #aaa;
 }
 
 .pulse {
@@ -106,7 +130,7 @@ body {
 
 @keyframes pulse {
   0% { transform: scale(1); }
-  50% { transform: scale(1.02); }
+  50% { transform: scale(1.015); }
   100% { transform: scale(1); }
 }
 </style>
@@ -115,6 +139,11 @@ body {
 <body>
 
 <div class="overlay" id="overlay">
+
+  <div class="branding-header">
+    <img src="main_page.png" alt="Gholfdag" class="main-graphic">
+    <img src="inpas_aim_logos.png" alt="Sponsors" class="sponsor-logos">
+  </div>
 
   <div class="grid">
 
@@ -129,7 +158,7 @@ body {
 
     <div class="right">
       <div class="qr">
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PAYMENT_LINK_HIER">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=YOUR_YOCO_LINK_HERE">
         <span>Skandeer om by te dra</span>
       </div>
     </div>
@@ -142,7 +171,7 @@ body {
 
   <div class="footer">
     <div>Regstreekse opdatering</div>
-    <div>Teikenbedrag: R50 000</div>
+    <div id="target">Teikenbedrag: R50 000</div>
   </div>
 
 </div>
@@ -160,7 +189,7 @@ evtSource.onmessage = function(event) {
     current = data.total;
 
     document.getElementById('amount').innerText =
-      'R' + current.toLocaleString() + ' ingesamel';
+      'R' + current.toLocaleString('en-ZA') + ' ingesamel';
 
     const percent = Math.min((current / goal) * 100, 100);
     document.getElementById('bar').style.width = percent + '%';
