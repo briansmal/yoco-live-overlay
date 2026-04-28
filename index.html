@@ -1,67 +1,176 @@
 <html>
 <head>
-  <title>Live Giving Overlay</title>
-  <style>
-    body {
-      margin: 0;
-      background: transparent;
-      overflow: hidden;
-      font-family: 'Segoe UI', sans-serif;
-    }
+<meta charset="UTF-8">
+<title>Finansiële Impak</title>
 
-    .overlay {
-      position: absolute;
-      bottom: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 70%;
-      background: rgba(0,0,0,0.6);
-      backdrop-filter: blur(10px);
-      border-radius: 20px;
-      padding: 20px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    }
+<style>
+body {
+  margin: 0;
+  background: transparent;
+  font-family: 'Segoe UI', sans-serif;
+}
 
-    .title {
-      font-size: 1.5em;
-      color: #fff;
-      opacity: 0.8;
-    }
+/* MAIN PANEL */
+.overlay {
+  position: absolute;
+  bottom: 50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  padding: 20px 30px;
 
-    .amount {
-      font-size: 2.5em;
-      color: #00ffcc;
-      margin: 5px 0;
-    }
+  background: rgba(20, 20, 20, 0.85);
+  backdrop-filter: blur(10px);
 
-    .bar-container {
-      width: 100%;
-      height: 20px;
-      background: rgba(255,255,255,0.1);
-      border-radius: 10px;
-      overflow: hidden;
-    }
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.08);
+}
 
-    .bar {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #00ffcc, #00ffaa);
-      transition: width 0.6s ease;
-    }
+/* GRID */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+}
 
-    .pulse {
-      animation: pulse 0.5s ease;
-    }
+/* LEFT */
+.left {
+  text-align: left;
+}
 
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-      100% { transform: scale(1); }
-    }
-  </style>
+.title {
+  font-size: 0.9em;
+  letter-spacing: 2px;
+  color: #aaa;
+}
+
+.subtitle {
+  font-size: 0.8em;
+  color: #666;
+}
+
+/* CENTER */
+.center {
+  text-align: center;
+}
+
+.amount {
+  font-size: 2.8em;
+  font-weight: 600;
+  color: white;
+}
+
+/* RIGHT */
+.right {
+  text-align: right;
+}
+
+.qr img {
+  width: 80px;
+}
+
+.qr span {
+  display: block;
+  font-size: 0.7em;
+  color: #ccc;
+}
+
+/* BAR */
+.bar-container {
+  margin-top: 15px;
+  width: 100%;
+  height: 12px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 6px;
+}
+
+.bar {
+  height: 100%;
+  width: 0%;
+  background: #2ed1a2;
+  transition: width 0.8s ease;
+}
+
+/* FOOTER */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 0.75em;
+  color: #888;
+}
+
+.pulse {
+  animation: pulse 0.4s ease;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+</style>
 </head>
+
 <body>
 
 <div class="overlay" id="overlay">
-  <div class="title">LIVE GIVING</div>
-  <div class="amount" id="amount">R0</div>
+
+  <div class="grid">
+
+    <div class="left">
+      <div class="title">FINANSIËLE IMPAK</div>
+      <div class="subtitle">Deursigtigheid • Vertroue • Groei</div>
+    </div>
+
+    <div class="center">
+      <div class="amount" id="amount">R0 ingesamel</div>
+    </div>
+
+    <div class="right">
+      <div class="qr">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=PAYMENT_LINK_HIER">
+        <span>Skandeer om by te dra</span>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="bar-container">
+    <div class="bar" id="bar"></div>
+  </div>
+
+  <div class="footer">
+    <div>Regstreekse opdatering</div>
+    <div>Teikenbedrag: R50 000</div>
+  </div>
+
+</div>
+
+<script>
+const goal = 50000;
+let current = 0;
+
+const evtSource = new EventSource('/events');
+
+evtSource.onmessage = function(event) {
+  const data = JSON.parse(event.data);
+
+  if (data.total !== current) {
+    current = data.total;
+
+    document.getElementById('amount').innerText =
+      'R' + current.toLocaleString() + ' ingesamel';
+
+    const percent = Math.min((current / goal) * 100, 100);
+    document.getElementById('bar').style.width = percent + '%';
+
+    const overlay = document.getElementById('overlay');
+    overlay.classList.add('pulse');
+    setTimeout(() => overlay.classList.remove('pulse'), 400);
+  }
+};
+</script>
+
+</body>
+</html>
