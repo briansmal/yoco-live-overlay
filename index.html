@@ -160,10 +160,10 @@
       <div class="right">
         <div class="qr-container">
           <div class="qr">
-            <!-- Vervang YOUR_PAYMENT_LINK_HERE met jou werklike Yoco link -->
+            <!-- Replace with your actual Yoco payment link -->
             <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YOUR_PAYMENT_LINK_HERE" alt="QR">
           </div>
-          <span>Skandeer om by te dra</span>
+          <span>Scan to contribute</span>
         </div>
       </div>
     </div>
@@ -173,79 +173,62 @@
     </div>
 
     <div class="footer">
-      <div class="footer-live">Regstreekse opdatering</div>
-      <div>Teiken: <span style="color: #fff;">R50 000</span></div>
+      <div class="footer-live">Live Update</div>
+      <div>Goal: <span style="color: #fff;">R50 000</span></div>
     </div>
   </div>
 
   <script>
-    /**
-     * KONFIGURASIE
-     */
     const GOAL_AMOUNT = 50000;
-    const API_KEY = "Bearer yoco_live_0c1bf7dac43d7097_94c0f0cfb7599fe8b587af91d98bdffa"; //[cite: 1]
     let currentTotal = 0;
 
     /**
-     * DATA VERWERKING
-     */
-    async function updateDashboard() {
-      try {
-        const response = await fetch("https://api.yoco.com/v1/payments/", {
-          method: "GET",
-          headers: { "Authorization": API_KEY }
-        });
-
-        if (!response.ok) throw new Error("API konneksie fout");
-
-        const result = await response.json(); //[cite: 1]
-        
-        // Tel slegs goedgekeurde transaksies op
-        // Yoco stuur bedrae in sente (bv. 10000 = R100.00)[cite: 1]
-        const approvedTotalCents = result.data
-          .filter(tx => tx.status === "approved") //[cite: 1]
-          .reduce((acc, tx) => acc + tx.total_amount.amount, 0); //[cite: 1]
-
-        const approvedTotalRands = approvedTotalCents / 100;
-
-        if (approvedTotalRands !== currentTotal) {
-          currentTotal = approvedTotalRands;
-          renderUI(currentTotal);
-        }
-      } catch (error) {
-        console.error("Fout met opdatering:", error);
-      }
-    }
-
-    /**
-     * UI RENDER LOGIKA
+     * UI RENDER LOGIC
      */
     function renderUI(value) {
       const display = document.getElementById('totalDisplay');
       const bar = document.getElementById('progressBar');
       const card = document.getElementById('mainCard');
 
-      // Formateer nommer vir Suid-Afrikaanse konteks
+      // Format number for South African locale
       display.innerText = value.toLocaleString('af-ZA', {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2
       });
 
-      // Bereken persentasie
+      // Calculate percentage for the bar
       const percentage = Math.min((value / GOAL_AMOUNT) * 100, 100);
       bar.style.width = percentage + '%';
 
-      // Visuele terugvoer
-      card.classList.remove('pulse');
-      void card.offsetWidth; // Trigger reflow
-      card.classList.add('pulse');
+      // Visual feedback: pulse when value changes
+      if (value !== currentTotal) {
+          card.classList.remove('pulse');
+          void card.offsetWidth; // Trigger reflow to restart animation
+          card.classList.add('pulse');
+          currentTotal = value;
+      }
     }
 
-    // Begin die proses
-    updateDashboard();
+    /**
+     * LIVE STREAM CONNECTION (SSE)
+     * This connects to your server.js /events endpoint[cite: 2]
+     */
+    const eventSource = new EventSource('/events');
 
-    // Kyk vir nuwe betalings elke 30 sekondes
-    setInterval(updateDashboard, 30000);
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);[cite: 2]
+        // data.total is the sum calculated by server.js
+        renderUI(data.total); 
+      } catch (err) {
+        console.error("Error parsing live data:", err);
+      }
+    };
+
+    eventSource.onerror = (err) => {
+      console.error("EventSource failed:", err);
+      // Optional: attempt to reconnect logic here
+    };
   </script>
 
 </body>
