@@ -4,282 +4,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gholfdag - Live Barometer</title>
-    <!-- Use Inter font from Google for a cleaner, modern professional look -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 
     <style>
-        /* RESET & BASIC STYLES */
         body, html {
             margin: 0;
             padding: 0;
             height: 100%;
-            overflow: hidden; /* Lock the view to one screen */
-            font-family: 'Inter', sans-serif;
-            -webkit-font-smoothing: antialiased;
-        }
-
-        /* 1. THE PARENT CONTAINER FOR LAYOUT (The Foundation) */
-        #page-wrapper {
-            position: relative;
             width: 100%;
-            height: 100vh;
-            display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center;    /* Center vertically */
-            overflow: hidden;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Keeps the focus on the barometer */
         }
 
-        /* 2. THE BACKGROUND LAYER (Image_0.png) */
-        .background-frame {
-            position: absolute;
+        /* FULL SCREEN BACKGROUND */
+        .bg-container {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            /* Reference your image file verbatim. No quotes needed in URL. */
-            background-image: url(image_0.png);
-            background-size: cover;    /* Force the image to fill the screen */
+            /* Fallback color if image fails */
+            background-color: #f1f1f1; 
+            /* IMPORTANT: Ensure 'main_page.png' is uploaded to your root folder */
+            background-image: url('main_page.png'); 
+            background-size: cover;
             background-position: center;
-            background-repeat: no-repeat;
-            z-index: 1; /* Push to the back */
+            z-index: -1;
         }
 
-        /* 3. THE FLOATING BAROMETER CARD (Hovering in the foreground) */
-        .overlay {
-            width: 90%;
-            max-width: 1200px;
-            padding: 40px 60px;
-            z-index: 10; /* Lifts it high over the background */
-            position: relative;
-            
-            /* Light-Mode Hover Visuals: (Harmony with image_0.png) */
-            background: linear-gradient(135deg, rgba(255,255,255,0.7) 0%, rgba(245,245,245,0.6) 100%);
-            
-            /* Essential depth effect and contrast isolation */
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            
-            border-radius: 20px;
-            border: 1px solid rgba(255,255,255,0.3); /* Subtle white border */
-            box-shadow: 0 10px 40px rgba(0,0,0,0.05); /* Very soft shadow for separation, not aggression */
-            transition: all 0.3s ease;
-        }
-
-        /* Grid Layout (UNCHANGED logic from previous) */
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr 2fr 1fr;
-            align-items: center;
-            gap: 30px;
-            margin-bottom: 25px;
-        }
-
-        /* Color Adjustments: Text must be dark now against light overlay */
-        .left { text-align: left; }
-        .title {
-            font-size: 1.6rem;
-            font-weight: 800;
-            letter-spacing: 2px;
-            color: #2c3e50; /* A soft dark blue-gray */
-        }
-        .subtitle {
-            font-size: 1.0rem;
-            color: #7f8c8d; /* Muted gray for description */
-            margin-top: 5px;
-        }
-
-        .center { text-align: center; }
-        .amount-container {
-            font-size: 5rem;
-            font-weight: 900;
-            color: #2c3e50;
+        /* CENTERED HOVERING CONTENT */
+        #page-wrapper {
+            height: 100vh;
             display: flex;
             justify-content: center;
-            align-items: baseline;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            align-items: center;
+            padding: 20px;
         }
-        .currency-symbol { font-size: 3rem; margin-right: 10px; color: #2ed1a2; }
 
-        .right { text-align: right; }
-        .qr-container {
+        /* GLASS MORPHISM EFFECT */
+        .overlay {
+            width: 100%;
+            max-width: 1100px;
+            padding: 50px;
+            background: rgba(255, 255, 255, 0.85); /* Semi-transparent white */
+            backdrop-filter: blur(10px); /* Blurs the background image behind the card */
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05); /* Soft professional shadow */
+            border: 1px solid rgba(255,255,255,0.4);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.2fr 2fr 1fr;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .title { font-size: 1.8rem; font-weight: 900; color: #1a365d; margin: 0; }
+        .subtitle { font-size: 1rem; color: #718096; margin-top: 4px; }
+
+        .amount-container {
             display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 10px;
+            justify-content: center;
+            align-items: center;
+            font-size: 5.5rem;
+            font-weight: 900;
+            color: #2d3748;
         }
-        .qr img {
-            width: 110px;
-            height: 110px;
-            padding: 8px;
-            background-color: white; /* Clean QR code backdrop */
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-        }
-        .qr span { font-size: 0.9rem; font-weight: 600; color: #2c3e50; }
+        .currency { color: #2ed1a2; margin-right: 15px; font-size: 3.5rem; }
 
-        /* PROGRESS BAR Visuals: (Unchanged logic, just light-mode track) */
+        .qr-section { text-align: right; }
+        .qr-section img {
+            width: 110px;
+            background: white;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        .qr-section p { font-size: 0.85rem; font-weight: 700; color: #4a5568; margin-top: 10px; }
+
+        /* PROGRESS BAR */
         .bar-container {
             width: 100%;
-            height: 24px;
-            background-color: rgba(0,0,0,0.03); /* Soft dark track instead of white track */
-            border-radius: 12px;
+            height: 22px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 50px;
+            margin: 35px 0 20px;
             overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.02);
-            margin: 20px 0;
         }
-
         .bar {
             height: 100%;
-            width: 0%; 
-            background: linear-gradient(90deg, #2ed1a2 0%, #3fe1b3 100%);
-            box-shadow: 0 0 10px rgba(46, 209, 162, 0.2);
-            transition: width 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            width: 0%;
+            background: linear-gradient(90deg, #2ed1a2, #3fe1b3);
+            border-radius: 50px;
+            transition: width 1.5s cubic-bezier(0.1, 0, 0.1, 1);
         }
 
         .footer {
             display: flex;
             justify-content: space-between;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #7f8c8d;
+            color: #a0aec0;
+            font-weight: 700;
+            font-size: 0.95rem;
         }
+        .live-dot { color: #e53e3e; display: flex; align-items: center; gap: 8px; }
+        .dot { height: 10px; width: 10px; background: #e53e3e; border-radius: 50%; animation: pulse-dot 1.5s infinite; }
 
-        .footer-live {
-            color: #e74c3c;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .footer-live::before {
-            content: '';
-            width: 10px;
-            height: 10px;
-            background-color: #e74c3c;
-            border-radius: 50%;
-            animation: blink 1s infinite alternate;
-        }
+        @keyframes pulse-dot { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
 
-        @keyframes blink { from { opacity: 1; } to { opacity: 0.3; } }
-        
-        .pulse { animation: pulse-effect 0.6s ease-out; }
-        @keyframes pulse-effect {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.02); border-color: #2ed1a2; }
-            100% { transform: scale(1); }
-        }
-
-        /* Mobile Breakpoint Adjustment (Crucial for tight graphics) */
-        @media (max-width: 900px) {
-            .background-frame { background-size: contain; background-position: top; } /* Adjust background focus for tall screens */
-            .grid { grid-template-columns: 1fr; text-align: center; gap: 20px;}
-            .amount-container { font-size: 3.5rem; }
-            .qr-container { align-items: center; }
-            .left, .right { text-align: center; }
+        @media (max-width: 850px) {
+            .grid { grid-template-columns: 1fr; text-align: center; }
+            .qr-section { text-align: center; }
+            .amount-container { font-size: 4rem; }
         }
     </style>
 </head>
-
 <body>
 
-    <!-- This is the container that manages the full-screen layout -->
-    <div id="page-wrapper">
-        
-        <!-- The Background Layer -->
-        <div class="background-frame"></div>
+    <div class="bg-container"></div>
 
-        <!-- The Foreground Layer (Dynamic Barometer) -->
+    <div id="page-wrapper">
         <div class="overlay" id="mainCard">
             <div class="grid">
-                <div class="left">
-                    <div class="title">GHOLFDAG</div>
-                    <div class="subtitle"> Transparency • Growth</div>
+                <div class="info">
+                    <h1 class="title">GHOLFDAG</h1>
+                    <p class="subtitle">Transparency • Growth</p>
                 </div>
 
-                <div class="center">
-                    <div class="amount-container">
-                        <span class="currency-symbol">R</span>
-                        <span id="totalDisplay">0.00</span>
-                    </div>
+                <div class="amount-container">
+                    <span class="currency">R</span>
+                    <span id="displayAmount">0,00</span>
                 </div>
 
-                <div class="right">
-                    <div class="qr-container">
-                        <div class="qr">
-                            <!-- Replace YOUR_LINK with your actual Yoco payment link -->
-                            <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YOUR_LINK" alt="QR">
-                        </div>
-                        <span>Scan to contribute</span>
-                    </div>
+                <div class="qr-section">
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=YOUR_YOCO_LINK" alt="QR">
+                    <p>Scan to contribute</p>
                 </div>
             </div>
 
             <div class="bar-container">
-                <div id="progressBar" class="bar"></div>
+                <div class="bar" id="progressBar"></div>
             </div>
 
             <div class="footer">
-                <div class="footer-live">Live Connection</div>
-                <div>Goal: <span style="color: #2c3e50;">R50 000</span></div>
+                <div class="live-dot"><div class="dot"></div> Live Connection</div>
+                <div>Goal: <span style="color: #2d3748;">R50 000</span></div>
             </div>
         </div>
-
-    </div> <!-- Close #page-wrapper -->
+    </div>
 
     <script>
-        const GOAL_AMOUNT = 50000;
-        let currentTotal = 0;
+        const GOAL = 50000;
+        
+        const evtSource = new EventSource('/events');
 
-        /**
-         * UI RENDER LOGIC (No major logic changes, just value comparison)
-         */
-        function renderUI(value) {
-            const display = document.getElementById('totalDisplay');
-            const bar = document.getElementById('progressBar');
-            const card = document.getElementById('mainCard');
+        evtSource.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            updateUI(data.total);
+        };
 
-            // Format number for South African locale (R 1 234,56)
-            display.innerText = value.toLocaleString('af-ZA', {
+        function updateUI(total) {
+            // Update Text
+            document.getElementById('displayAmount').innerText = total.toLocaleString('af-ZA', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
 
-            // Calculate percentage for the bar
-            const percentage = Math.min((value / GOAL_AMOUNT) * 100, 100);
-            bar.style.width = percentage + '%';
-
-            // Visual feedback: pulse ONLY when value actually changes
-            if (value !== currentTotal) {
-                card.classList.remove('pulse');
-                void card.offsetWidth; // Trigger reflow to restart animation
-                card.classList.add('pulse');
-                currentTotal = value;
-            }
+            // Update Bar
+            const percent = Math.min((total / GOAL) * 100, 100);
+            document.getElementById('progressBar').style.width = percent + '%';
         }
-
-        /**
-         * LIVE STREAM CONNECTION (SSE)
-         * Listens to the /events stream from your server.js
-         */
-        const eventSource = new EventSource('/events');
-
-        eventSource.onmessage = function(event) {
-            try {
-                const data = JSON.parse(event.data);
-                // Only update if data contains a valid total number
-                if (data && typeof data.total === 'number') {
-                    renderUI(data.total);
-                }
-            } catch (err) {
-                console.error("Error parsing live data:", err);
-            }
-        };
-
-        eventSource.onerror = function(err) {
-            console.error("EventSource failed. Connection to server lost.");
-        };
     </script>
-
 </body>
 </html>
