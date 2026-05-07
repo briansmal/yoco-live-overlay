@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gholfdag Live Barometer</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
     <style>
         body, html {
@@ -13,7 +15,7 @@
             height: 100%;
             width: 100%;
             font-family: 'Inter', sans-serif;
-            background-color: #f4f7f6; /* Matching the mockup's light gray tone */
+            background-color: #f4f7f6;
             overflow: hidden;
         }
 
@@ -25,33 +27,34 @@
             box-sizing: border-box;
         }
 
-        /* TOP SECTION: Left QR and Right Branding */
+        /* TOP SECTION */
         .top-banner {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            flex: 1; /* Pushes the barometer to the bottom */
+            flex: 1;
         }
 
         .qr-side img {
-            width: 220px; /* Larger as per mockup */
+            width: 220px;
             height: auto;
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
 
         .branding-side img {
-            width: 650px; /* Main logo + sponsor logos combined */
+            width: 650px;
             height: auto;
         }
 
-        /* BOTTOM SECTION: The White Barometer Card */
+        /* BAROMETER CARD */
         .barometer-card {
             background: #ffffff;
             border-radius: 40px;
             padding: 40px 60px;
             box-shadow: 0 15px 45px rgba(0,0,0,0.04);
             margin-bottom: 20px;
+            transition: all 0.5s ease;
         }
 
         .main-row {
@@ -77,12 +80,12 @@
         }
 
         .rand-symbol {
-            color: #2ed1a2; /* The specific teal from your mockup */
+            color: #2ed1a2;
             margin-right: 20px;
             font-size: 4.5rem;
         }
 
-        /* PROGRESS BAR STYLING */
+        /* PROGRESS BAR */
         .progress-track {
             width: 100%;
             height: 45px;
@@ -123,23 +126,25 @@
             animation: pulse 1.5s infinite;
         }
 
+        /* GOAL REACHED STATE */
+        .goal-reached {
+            background: linear-gradient(145deg, #ffffff, #fffdf0);
+            border: 2px solid #f1c40f;
+            transform: scale(1.02);
+        }
+
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="page-wrapper">
-        
         <div class="top-banner">
-            <div class="qr-side">
-                <img src="qr_side.png" alt="Scan to contribute">
-            </div>
-            <div class="branding-side">
-                <img src="branding_top.png" alt="GHOLFDAG Branding">
-            </div>
+            <div class="qr-side"><img src="qr_side.png" alt="Scan"></div>
+            <div class="branding-side"><img src="branding_top.png" alt="Branding"></div>
         </div>
 
-        <div class="barometer-card">
+        <div class="barometer-card" id="mainCard">
             <div class="main-row">
                 <div class="label-insameling">INSAMELING</div>
                 <div class="amount-display">
@@ -154,14 +159,14 @@
 
             <div class="status-bar">
                 <div class="live-tag"><div class="dot"></div> Live Connection</div>
-                <div>Goal: <span style="color: #2c3e50;">R7 297.50</span></div>
+                <div id="goalLabel">Goal: <span style="color: #2c3e50;">R50 000</span></div>
             </div>
         </div>
-
     </div>
 
     <script>
-        const GOAL = 7297.50;
+        const GOAL = 50000;
+        let hasCelebrated = false;
         const evtSource = new EventSource('/events');
 
         evtSource.onmessage = function(event) {
@@ -169,15 +174,54 @@
             updateUI(data.total);
         };
 
+        function fireConfetti() {
+            var duration = 5 * 1000;
+            var end = Date.now() + duration;
+
+            (function frame() {
+                confetti({
+                    particleCount: 3,
+                    angle: 60,
+                    spread: 55,
+                    origin: { x: 0, y: 0.8 },
+                    colors: ['#2ed1a2', '#f1c40f', '#2c3e50']
+                });
+                confetti({
+                    particleCount: 3,
+                    angle: 120,
+                    spread: 55,
+                    origin: { x: 1, y: 0.8 },
+                    colors: ['#2ed1a2', '#f1c40f', '#2c3e50']
+                });
+
+                if (Date.now() < end) {
+                    requestAnimationFrame(frame);
+                }
+            }());
+        }
+
         function updateUI(total) {
-            // Formatting for South African locale
-            document.getElementById('amountValue').innerText = total.toLocaleString('af-ZA', {
+            const amountEl = document.getElementById('amountValue');
+            const fillEl = document.getElementById('barFill');
+            const cardEl = document.getElementById('mainCard');
+            const goalLabel = document.getElementById('goalLabel');
+
+            amountEl.innerText = total.toLocaleString('af-ZA', {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2
             });
 
             const percent = Math.min((total / GOAL) * 100, 100);
-            document.getElementById('barFill').style.width = percent + '%';
+            fillEl.style.width = percent + '%';
+
+            // Check for goal completion
+            if (total >= GOAL && !hasCelebrated) {
+                hasCelebrated = true;
+                cardEl.classList.add('goal-reached');
+                fillEl.style.background = '#f1c40f'; // Turn bar gold
+                goalLabel.innerHTML = '🏆 <span style="color: #27ae60;">GOAL REACHED!</span>';
+                fireConfetti();
+            }
         }
     </script>
 </body>
