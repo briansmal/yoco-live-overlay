@@ -154,14 +154,14 @@
 
             <div class="status-bar">
                 <div class="live-tag"><div class="dot"></div> Live Connection</div>
-                <div>Goal: <span style="color: #2c3e50;">R50 000</span></div>
+                <div>Goal: <span style="color: #2c3e50;">R150 000</span></div>
             </div>
         </div>
 
     </div>
 
     <script>
-        const GOAL = 50000;
+        const GOAL = 150000;
         const evtSource = new EventSource('/events');
 
         evtSource.onmessage = function(event) {
