@@ -49,18 +49,35 @@
 
         /* BAROMETER CARD */
         .barometer-card {
+            position: relative; /* Needed for positioning the org logos */
             background: #ffffff;
             border-radius: 40px;
-            padding: 40px 60px;
+            padding: 60px 60px 40px 60px; /* Top padding increased for logos */
             box-shadow: 0 15px 45px rgba(0,0,0,0.04);
             margin-bottom: 20px;
             transition: all 0.5s ease;
+        }
+
+        /* NEW: Beneficiary Logo Strip */
+        .org-logo-strip {
+            position: absolute;
+            top: -45px; /* Adjust this to move logos up or down */
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            text-align: center;
+        }
+
+        .org-logo-strip img {
+            height: 100px; /* Adjust height based on your file */
+            width: auto;
         }
 
         .main-row {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-top: 20px;
             margin-bottom: 30px;
         }
 
@@ -126,11 +143,10 @@
             animation: pulse 1.5s infinite;
         }
 
-        /* GOAL REACHED STATE */
         .goal-reached {
             background: linear-gradient(145deg, #ffffff, #fffdf0);
             border: 2px solid #f1c40f;
-            transform: scale(1.02);
+            transform: scale(1.01);
         }
 
         @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
@@ -145,6 +161,11 @@
         </div>
 
         <div class="barometer-card" id="mainCard">
+            
+            <div class="org-logo-strip">
+                <img src="org_logos.png" alt="Beneficiaries">
+            </div>
+
             <div class="main-row">
                 <div class="label-insameling">INSAMELING</div>
                 <div class="amount-display">
@@ -159,13 +180,13 @@
 
             <div class="status-bar">
                 <div class="live-tag"><div class="dot"></div> Live Connection</div>
-                <div id="goalLabel">Goal: <span style="color: #2c3e50;">R7200</span></div>
+                <div id="goalLabel">Goal: <span style="color: #2c3e50;">R50 000</span></div>
             </div>
         </div>
     </div>
 
     <script>
-        const GOAL = 7200;
+        const GOAL = 50000;
         let hasCelebrated = false;
         const evtSource = new EventSource('/events');
 
@@ -214,11 +235,10 @@
             const percent = Math.min((total / GOAL) * 100, 100);
             fillEl.style.width = percent + '%';
 
-            // Check for goal completion
             if (total >= GOAL && !hasCelebrated) {
                 hasCelebrated = true;
                 cardEl.classList.add('goal-reached');
-                fillEl.style.background = '#f1c40f'; // Turn bar gold
+                fillEl.style.background = '#f1c40f';
                 goalLabel.innerHTML = '🏆 <span style="color: #27ae60;">GOAL REACHED!</span>';
                 fireConfetti();
             }
