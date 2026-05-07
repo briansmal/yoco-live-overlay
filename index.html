@@ -27,7 +27,7 @@
             box-sizing: border-box;
         }
 
-        /* TOP SECTION */
+        /* TOP LOGOS */
         .top-banner {
             display: flex;
             justify-content: space-between;
@@ -49,19 +49,19 @@
 
         /* BAROMETER CARD */
         .barometer-card {
-            position: relative; /* Needed for positioning the org logos */
+            position: relative;
             background: #ffffff;
             border-radius: 40px;
-            padding: 60px 60px 40px 60px; /* Top padding increased for logos */
+            padding: 70px 60px 40px 60px; /* Top padding for the overlapping logos */
             box-shadow: 0 15px 45px rgba(0,0,0,0.04);
             margin-bottom: 20px;
             transition: all 0.5s ease;
         }
 
-        /* NEW: Beneficiary Logo Strip */
+        /* Beneficiary Logo Strip (Overlapping the card) */
         .org-logo-strip {
             position: absolute;
-            top: -10px; /* Adjust this to move logos up or down */
+            top: -50px;
             left: 50%;
             transform: translateX(-50%);
             width: auto;
@@ -69,7 +69,7 @@
         }
 
         .org-logo-strip img {
-            height: 100px; /* Adjust height based on your file */
+            height: 110px;
             width: auto;
         }
 
@@ -105,7 +105,7 @@
         /* PROGRESS BAR */
         .progress-track {
             width: 100%;
-            height: 45px;
+            height: 50px;
             background: #f0f2f5;
             border-radius: 50px;
             overflow: hidden;
@@ -117,7 +117,7 @@
             width: 0%;
             background: #2ed1a2;
             border-radius: 50px;
-            transition: width 1.5s cubic-bezier(0.1, 0, 0.1, 1);
+            transition: width 2s cubic-bezier(0.1, 0, 0.1, 1);
         }
 
         .status-bar {
@@ -143,8 +143,9 @@
             animation: pulse 1.5s infinite;
         }
 
+        /* GOAL REACHED STATE */
         .goal-reached {
-            background: linear-gradient(145deg, #ffffff, #fffdf0);
+            background: linear-gradient(145deg, #ffffff, #fffef0);
             border: 2px solid #f1c40f;
             transform: scale(1.01);
         }
@@ -156,12 +157,11 @@
 
     <div id="page-wrapper">
         <div class="top-banner">
-            <div class="qr-side"><img src="qr_side.png" alt="Scan"></div>
-            <div class="branding-side"><img src="branding_top.png" alt="Branding"></div>
+            <div class="qr-side"><img src="qr_side.png" alt="Scan Om Te Skenk"></div>
+            <div class="branding-side"><img src="branding_top.png" alt="Gholfdag 2026"></div>
         </div>
 
         <div class="barometer-card" id="mainCard">
-            
             <div class="org-logo-strip">
                 <img src="org_logos.png" alt="Beneficiaries">
             </div>
@@ -179,36 +179,70 @@
             </div>
 
             <div class="status-bar">
-                <div class="live-tag"><div class="dot"></div> Live Connection</div>
-                <div id="goalLabel">Goal: <span style="color: #2c3e50;">R5</span></div>
+                <div class="live-tag"><div class="dot"></div> Outomatiese Opdatering</div>
+                <div id="goalLabel">Doelwit: <span style="color: #2c3e50;">R50 000</span></div>
             </div>
         </div>
     </div>
 
     <script>
-        const GOAL = 5;
+        const GOAL = 50000;
         let hasCelebrated = false;
-        const evtSource = new EventSource('/events');
 
-        evtSource.onmessage = function(event) {
-            const data = JSON.parse(event.data);
-            updateUI(data.total);
-        };
+        // Function to fetch fresh total from your server
+        async function refreshTotal() {
+            try {
+                const response = await fetch('/api/total');
+                const data = await response.json();
+                
+                if (data.total !== undefined) {
+                    updateUI(data.total);
+                }
+            } catch (err) {
+                console.warn("Kon nie met bediener koppel nie. Probeer weer...");
+            }
+        }
+
+        function updateUI(total) {
+            const amountEl = document.getElementById('amountValue');
+            const fillEl = document.getElementById('barFill');
+            const cardEl = document.getElementById('mainCard');
+            const goalLabel = document.getElementById('goalLabel');
+
+            // Update the number with SA formatting
+            amountEl.innerText = total.toLocaleString('af-ZA', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+
+            // Update the bar
+            const percent = Math.min((total / GOAL) * 100, 100);
+            fillEl.style.width = percent + '%';
+
+            // Victory logic
+            if (total >= GOAL && !hasCelebrated) {
+                hasCelebrated = true;
+                cardEl.classList.add('goal-reached');
+                fillEl.style.background = '#f1c40f'; // Gold bar
+                goalLabel.innerHTML = '🏆 <span style="color: #27ae60;">DOELWIT BEREIK!</span>';
+                fireConfetti();
+            }
+        }
 
         function fireConfetti() {
-            var duration = 5 * 1000;
+            var duration = 6 * 1000;
             var end = Date.now() + duration;
 
             (function frame() {
                 confetti({
-                    particleCount: 3,
+                    particleCount: 4,
                     angle: 60,
                     spread: 55,
                     origin: { x: 0, y: 0.8 },
                     colors: ['#2ed1a2', '#f1c40f', '#2c3e50']
                 });
                 confetti({
-                    particleCount: 3,
+                    particleCount: 4,
                     angle: 120,
                     spread: 55,
                     origin: { x: 1, y: 0.8 },
@@ -221,28 +255,10 @@
             }());
         }
 
-        function updateUI(total) {
-            const amountEl = document.getElementById('amountValue');
-            const fillEl = document.getElementById('barFill');
-            const cardEl = document.getElementById('mainCard');
-            const goalLabel = document.getElementById('goalLabel');
+        // Start Polling: Check every 10 seconds
+        refreshTotal(); // Initial check
+        setInterval(refreshTotal, 10000); 
 
-            amountEl.innerText = total.toLocaleString('af-ZA', {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2
-            });
-
-            const percent = Math.min((total / GOAL) * 100, 100);
-            fillEl.style.width = percent + '%';
-
-            if (total >= GOAL && !hasCelebrated) {
-                hasCelebrated = true;
-                cardEl.classList.add('goal-reached');
-                fillEl.style.background = '#f1c40f';
-                goalLabel.innerHTML = '🏆 <span style="color: #27ae60;">GOAL REACHED!</span>';
-                fireConfetti();
-            }
-        }
     </script>
 </body>
 </html>
